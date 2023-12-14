@@ -176,4 +176,12 @@
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Kalyp-Technologies Packages</name>
+            <url>https://maven.pkg.github.com/Kalyp-Technologies/firefly-sdk-java</url>
+        </repository>
+    </distributionManagement>
 </project>
