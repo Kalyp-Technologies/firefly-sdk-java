@@ -6,7 +6,7 @@
 
     <groupId>com.kalyp</groupId>
     <artifactId>firefly-sdk-java</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>Firefly Java SDK</name>
     <description>The Firefly Java SDK holds the client classes that are used for communicating with Firefly</description>
     <url>https://hyperledger.github.io/firefly/</url>
