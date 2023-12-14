@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.kalyp</groupId>
+    <artifactId>firefly-sdk-java</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Firefly Java SDK</name>
+    <description>The Firefly Java SDK holds the client classes that are used for communicating with Firefly</description>
+    <url>https://hyperledger.github.io/firefly/</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <junit.version>5.9.1</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>3.0.0-M1</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.19</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser-v3</artifactId>
+            <version>2.1.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                    <encoding>UTF-8</encoding>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <excludePackageNames>*.transform</excludePackageNames>
+                    <minmemory>128m</minmemory>
+                    <maxmemory>1024m</maxmemory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.1.0</version>
+                <executions>
+
+                    <!-- Firefly Core Client API spec -->
+                    <execution>
+                        <id>firefly-core-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>
+                                ${project.basedir}/src/main/resources/swagger.yaml
+                            </inputSpec>
+                            <generatorName>java</generatorName>
+                            <apiPackage>com.kalyp.firefly.api</apiPackage>
+                            <modelPackage>com.kalyp.firefly.model</modelPackage>
+                            <!--							<strictSpec>true</strictSpec>-->
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <library>native</library>
+                                <generateClientAsBean>true</generateClientAsBean>
+                                <delegatePattern>false</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useBeanValidation>true</useBeanValidation>
+                                <useClassLevelBeanValidation>false</useClassLevelBeanValidation>
+                                <useTags>false</useTags>
+                                <useJakartaEe>true</useJakartaEe>
+                                <openApiNullable>false</openApiNullable>
+                                <useOptional>false</useOptional>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- This profile uses the JAPICMP plugin to generate a report of changes between the release version and the latest version -->
+    <!-- For more information on the plugin, see https://github.com/siom79/japicmp -->
+    <profiles>
+        <profile>
+            <id>versiondiff</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.siom79.japicmp</groupId>
+                        <artifactId>japicmp-maven-plugin</artifactId>
+                        <version>0.5.0</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>cmp</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <oldVersion>
+                                <dependency>
+                                    <groupId>com.amazonaws</groupId>
+                                    <artifactId>aws-java-sdk-account</artifactId>
+                                    <version>RELEASE</version>
+                                </dependency>
+                            </oldVersion>
+                            <newVersion>
+                                <file>
+                                    <path>${project.build.directory}/${project.artifactId}-${project.version}.jar</path>
+                                </file>
+                            </newVersion>
+                            <parameter>
+                                <onlyModified>true</onlyModified>
+                                <accessModifier>public</accessModifier>
+                                <breakBuildOnModifications>false</breakBuildOnModifications>
+                                <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                                <onlyBinaryIncompatible>false</onlyBinaryIncompatible>
+                            </parameter>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
