@@ -94,7 +94,7 @@ public class MessagesExample {
 
 ## Generated schemas
 
-The types for FireFly requests and responses are generated from the [OpenAPI schema for FireFly](https://hyperledger.github.io/firefly/swagger/swagger.html)
+The types for FireFly requests and responses are generated from the [OpenAPI schema for FireFly](https://hyperledger.github.io/firefly/swagger/swagger.html).
 
 ## Git repositories
 
