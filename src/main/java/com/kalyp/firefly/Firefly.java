@@ -15,15 +15,16 @@ public class Firefly {
     private GlobalApi globalApi;
     private NonDefaultNamespaceApi nonDefaultNamespaceApi;
 
-    public Firefly(String host) {
-        ApiClient apiClient = new ApiClient();
-        apiClient.updateBaseUri(host);
+    private ApiClient apiClient;
+
+    public Firefly(String uri) {
+        this.apiClient = new ApiClient().setBasePath(uri);
         this.defaultNamespaceApi = new DefaultNamespaceApi(apiClient);
         this.globalApi = new GlobalApi(apiClient);
         this.nonDefaultNamespaceApi = new NonDefaultNamespaceApi(apiClient);
     }
 
-    public void sendBroadcast(String message) throws ApiException {
+    public void sendBroadcast(String message) {
 
         // Forward the broadcast on to firefly-core component.
         PostNewMessageBroadcastRequest ffRequest = new PostNewMessageBroadcastRequest()
@@ -31,7 +32,7 @@ public class Firefly {
         PostNewMessageBroadcast200Response postNewMessageBroadcast200Response = defaultNamespaceApi.postNewMessageBroadcast(null, null, ffRequest);
     }
 
-    public void sendPrivateMessage(String message, String recipient) throws ApiException {
+    public void sendPrivateMessage(String message, String recipient) {
 
         PostNewMessagePrivateRequest ffPrivateMessage = new PostNewMessagePrivateRequest()
                 .addDataItem(new PostContractAPIInvokeRequestMessageDataInner().value(message))
@@ -41,43 +42,43 @@ public class Firefly {
         defaultNamespaceApi.postNewMessagePrivate(null, null, ffPrivateMessage);
 
     }
-    public void sendPrivateMessageWithReply(String message) throws ApiException {
+    public void sendPrivateMessageWithReply(String message) {
 
         PostNewMessagePrivateRequest ffPrivateMessage = new PostNewMessagePrivateRequest().addDataItem(new PostContractAPIInvokeRequestMessageDataInner().value(message));
         defaultNamespaceApi.postNewMessageRequestReply(null, ffPrivateMessage);
 
     }
 
-    public List<Namespace> listNamespaces () throws ApiException {
+    public List<Namespace> listNamespaces () {
 
         return globalApi.getNamespaces(null, null);
 
     }
 
-    public List<Namespace> listNamespacesIncludeInitializing () throws ApiException {
+    public List<Namespace> listNamespacesIncludeInitializing () {
 
         return globalApi.getNamespaces("true", null);
 
     }
 
-    public List<Identity> listIdentities () throws ApiException {
+    public List<Identity> listIdentities () {
 
         return defaultNamespaceApi.getIdentities(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     }
 
-    public Identity getIdentityByIdWithVerifiers(String id) throws ApiException {
+    public Identity getIdentityByIdWithVerifiers(String id) {
 
         return defaultNamespaceApi.getIdentityByID(id, "true", null);
 
     }
 
-    public List<GetDatatypes200ResponseInner> listDataTypes() throws ApiException {
+    public List<GetDatatypes200ResponseInner> listDataTypes() {
 
         return defaultNamespaceApi.getDatatypes(null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
-    public List<Identity> listOrganizations() throws ApiException {
+    public List<Identity> listOrganizations() {
 
         return defaultNamespaceApi.getNetworkOrgs(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
@@ -90,7 +91,7 @@ public class Firefly {
     // TODO temporary to rewire up existing services [__ ryan-griffiths 05-02-24]
     //   - should refactor to match firefly-node-sdk (and not be Fabric specific)
     /** Invoke where chaincode args have already been serialised (i.e. don't require firefly FFI. */
-    public PostContractAPIInvoke200Response invoke(String channel, String chaincode, String function, List<String> args, boolean confirm) throws ApiException {
+    public PostContractAPIInvoke200Response invoke(String channel, String chaincode, String function, List<String> args, boolean confirm) {
 
         // Prepare the firefly core request for the `contracts/invoke` endpoint.
         PostContractInvokeRequest ffRequest = new PostContractInvokeRequest()
@@ -111,7 +112,7 @@ public class Firefly {
     // TODO temporary to rewire up existing services [__ ryan-griffiths 05-02-24]
     //   - should refactor to match firefly-node-sdk (and not be Fabric specific)
     /** Query where chaincode args have already been serialised (i.e. don't require firefly FFI. */
-    public Map<String, Object> query(String channel, String chaincode, String function, List<String> args) throws ApiException {
+    public Map<String, Object> query(String channel, String chaincode, String function, List<String> args) {
 
         // Prepare the firefly-core query API call.
         PostContractQueryRequest ffRequest = new PostContractQueryRequest()
@@ -144,5 +145,22 @@ public class Firefly {
             unorderedArgs.put("arg" + i, args.get(i));
         }
         return unorderedArgs;
+    }
+
+    // TODO debug only? [__ ryan-griffiths 06-02-24]
+    public ApiClient apiClient() {
+        return apiClient;
+    }
+
+    public DefaultNamespaceApi defaultNamespaceApi(){
+        return defaultNamespaceApi;
+    }
+
+    public GlobalApi globalApi(){
+        return globalApi;
+    }
+
+    public NonDefaultNamespaceApi nonDefaultNamespaceApi(){
+        return nonDefaultNamespaceApi;
     }
 }
