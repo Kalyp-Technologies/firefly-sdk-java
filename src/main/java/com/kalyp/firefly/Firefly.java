@@ -165,23 +165,54 @@ public class Firefly {
     }
 
     public GetContractAPIListeners200ResponseInner registerContractListener(
+        String listenerName,
         String channel,
         String chaincode,
         String eventName,
         String topic
     ) {
 
+        // TODO obviously this is Fabric specific... testing only for now. [__ ryan-griffiths 08-02-24]
+        //   - note: no need to have an FFI defined to listen to CC events.
         PostNewContractListenerRequest request = new PostNewContractListenerRequest()
-            //.setInterface() // TODO hopefully shouldn't need... but maybe [__ ryan-griffiths 08-02-24]
+            .name(listenerName)
             .location(Map.of(
                 "channel", channel,
                 "chaincode", chaincode))
-            .event(new GetContractAPIListeners200ResponseInnerEvent()
-                .name(eventName))   // TODO see if ".*" will work [__ ryan-griffiths 08-02-24]
-            .options(new GetContractAPIListeners200ResponseInnerOptions()
-                .firstEvent("newest"))
+            .event(new GetContractAPIListeners200ResponseInnerEvent().name(eventName))
+            .options(new GetContractAPIListeners200ResponseInnerOptions().firstEvent("newest"))
             .topic(topic);
 
         return defaultNamespaceApi.postNewContractListener(null, request);
     }
+
+    /**
+     * POST http://localhost:5000/api/v1/namespaces/default/contracts/listeners
+     *
+     * {
+     *   "event": {
+     *     "name": ".*"
+     *   },
+     *   "location": {
+     *     "channel": "firefly",
+     *     "chaincode": "example"
+     *   },
+     *   "name": "subscriptionName",
+     *   "options": {
+     *     "firstEvent": "oldest"
+     *   },
+     *   "topic": "pe-events"
+     * }
+     */
+
+    // https://hyperledger.github.io/firefly/tutorials/events.html#websockets-example-1-ephemeral-subscription-with-auto-commit
+    //
+    // To listen to events:
+    // wscat -c 'ws://localhost:5000/ws?namespace=default&ephemeral&autoack'
+    //
+    // Alternatively, could also set up a subscription and then listen to that particular subscription.
+    // POST http://localhost:5000/api/v1/namespaces/default/subscriptions
+    // The subscription allows for filtering e.g.:
+    //   - for a particular listener id: `{"filter": {"blockchainevent": { "listener": "f6d46424-8e05-4d6b-9dad-b4a8624a9d0c" }}}`
+    //   - or a particular CC event key: `{"filter": {"blockchainevent": { "name": "PeApproveEvent" }}}`
 }
