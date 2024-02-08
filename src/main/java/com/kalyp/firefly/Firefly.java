@@ -163,4 +163,25 @@ public class Firefly {
     public NonDefaultNamespaceApi nonDefaultNamespaceApi(){
         return nonDefaultNamespaceApi;
     }
+
+    public GetContractAPIListeners200ResponseInner registerContractListener(
+        String channel,
+        String chaincode,
+        String eventName,
+        String topic
+    ) {
+
+        PostNewContractListenerRequest request = new PostNewContractListenerRequest()
+            //.setInterface() // TODO hopefully shouldn't need... but maybe [__ ryan-griffiths 08-02-24]
+            .location(Map.of(
+                "channel", channel,
+                "chaincode", chaincode))
+            .event(new GetContractAPIListeners200ResponseInnerEvent()
+                .name(eventName))   // TODO see if ".*" will work [__ ryan-griffiths 08-02-24]
+            .options(new GetContractAPIListeners200ResponseInnerOptions()
+                .firstEvent("newest"))
+            .topic(topic);
+
+        return defaultNamespaceApi.postNewContractListener(null, request);
+    }
 }
